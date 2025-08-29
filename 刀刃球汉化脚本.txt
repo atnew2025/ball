@@ -1,0 +1,258 @@
+--============================= 
+-- Roblox 游戏汉化脚本（新版） 
+--============================= 
+
+local Players = game:GetService("Players") 
+local LP = Players.LocalPlayer 
+local CoreGui = game:GetService("CoreGui") 
+
+--============================= 
+-- 翻译表 
+--============================= 
+local TRANSLATIONS = { 
+    -- 基础界面元素
+    ["Enabled"] = "启用",
+    ["Disabled"] = "禁用",
+    ["On"] = "开启",
+    ["Off"] = "关闭",
+    ["Yes"] = "是",
+    ["No"] = "否",
+    ["OK"] = "确定",
+    ["Cancel"] = "取消",
+    ["Apply"] = "应用",
+    ["Reset"] = "重置",
+    ["Default"] = "默认",
+    ["Custom"] = "自定义",
+    ["Settings"] = "设置",
+    ["Options"] = "选项",
+    ["Save"] = "保存",
+    ["Load"] = "加载",
+    ["Exit"] = "退出",
+    ["Back"] = "返回",
+    ["Next"] = "下一步",
+    ["Previous"] = "上一步",
+    
+    -- 游戏特定元素（Parry Hub）
+    ["Blatant"] = "明显",
+    ["Auto Parry"] = "自动招架",
+    ["Auto Spam Parry"] = "连发招架",
+    ["Curve Type"] = "曲线类型",
+    ["Camera"] = "摄像机",
+    ["Parry Accuracy"] = "招架精度",
+    ["Randomized Parry Accuracy"] = "随机招架精度",
+    ["Phantom Detection"] = "幻影检测",
+    ["Infinity Detection"] = "无限检测",
+    ["Keypress"] = "按键触发",
+    ["Notify"] = "通知",
+    ["Lobby AP"] = "大厅招架",
+    ["Lobby AP Accuracy"] = "大厅招架精度",
+    ["Spam Threshold"] = "Spam阈值",
+    ["Automatically Parries Ball"] = "自动招架球",
+    ["Automatically Spam Parries Ball"] = "自动连发招架球",
+    ["Automatically Parries Ball In Lobby"] = "大厅自动招架球",
+
+    -- 玩家功能面板
+    ["Speed"] = "速度",
+    ["Increases Player Speed"] = "提升玩家速度",
+    ["Strafe Speed"] = "横向移动速度",
+    ["Spinbot"] = "旋转",
+    ["Spins Player"] = "旋转玩家",
+    ["Spinbot Speed"] = "旋转速度",
+    ["Field of View"] = "视野",
+    ["Changes Camera POV"] = "改变摄像机视角",
+    ["Camera FOV"] = "摄像机视野",
+    ["Emotes"] = "动作表情",
+    ["Custom Emotes"] = "自定义动作表情",
+    ["Selected Emotes"] = "选择的动作表情",
+    ["Player Cosmetics"] = "玩家外观",
+    ["Apply Headless And Korblox"] = "应用无头与Korblox",
+    ["Fly"] = "飞行",
+    ["Allows Players to Fly"] = "允许玩家飞行",
+    ["No Slow"] = "不减速",
+    ["Players Cannot Be Slowed Down In Any Way"] = "玩家不会因任何方式被减速",
+    ["UI [For Mobile]"] = "UI [移动端]",
+    -- 视觉与球体功能
+    ["Filter"] = "滤镜",
+    ["Toggles Custom World Filter Effects"] = "切换自定义世界滤镜效果",
+    ["Enabled Hue"] = "启用颜色",
+    ["World"] = "世界",
+    ["Misc"] = "杂项",
+    ["Ball Trail"] = "球轨迹",
+    ["Add Rainbow Line As The Ball Moves"] = "球移动时添加彩虹轨迹",
+    ["View Ball"] = "观察球",
+    ["Switch View From Character To Ball"] = "将视角从角色切换到球体",
+    ["Ability ESP"] = "能力透视",
+    ["ESP Ability All Player"] = "显示所有玩家能力",
+    ["Custom Sky"] = "自定义天空",
+    ["Changes Sky"] = "更改天空",
+    ["Lookat Ball"] = "注视球体",
+    ["Look The Ball"] = "注视球体",
+    ["Skin Changer"] = "皮肤更换",
+    ["Change Sword Skin"] = "更换剑皮肤",
+    ["Auto Play"] = "自动游玩",
+    ["Use AI To Play Automatically"] = "使用AI自动游玩",
+    ["Ball Stats"] = "球体统计",
+    ["Show Ball Index"] = "显示球索引",
+    ["Visualize"] = "可视化",
+    ["Show Visualize"] = "显示可视化",
+    ["Clash Mode"] = "雷电出品",
+    ["ikorz (nature 1v)"] = "雷电出品",
+    ["lkorz (nature 1v)"] = "雷电出品",
+}
+
+--============================= 
+-- 核心翻译逻辑 
+--============================= 
+local function translate(obj) 
+    if obj:IsA("TextLabel") or obj:IsA("TextButton") then 
+        local txt = tostring(obj.Text or "") 
+        if TRANSLATIONS[txt] then 
+            obj.Text = TRANSLATIONS[txt] 
+        end 
+    elseif obj:IsA("TextBox") then 
+        local ph = tostring(obj.PlaceholderText or "") 
+        if TRANSLATIONS[ph] then 
+            obj.PlaceholderText = TRANSLATIONS[ph] 
+        end 
+    elseif obj:IsA("ImageLabel") or obj:IsA("ImageButton") then 
+        -- 图片菜单用名字匹配，叠加中文 
+        local nm = tostring(obj.Name or "") 
+        if TRANSLATIONS[nm] and not obj:FindFirstChild("CN_Label") then 
+            local lbl = Instance.new("TextLabel") 
+            lbl.Name = "CN_Label" 
+            lbl.BackgroundTransparency = 1 
+            lbl.Size = UDim2.new(1,0,1,0) 
+            lbl.Font = Enum.Font.SourceSansSemibold 
+            lbl.TextSize = math.min(16, obj.AbsoluteSize.Y * 0.5) -- 根据图片大小调整文字
+            lbl.TextColor3 = Color3.fromRGB(240,240,240) 
+            lbl.TextStrokeTransparency = 0.5 
+            lbl.TextStrokeColor3 = Color3.fromRGB(0,0,0) 
+            lbl.Text = TRANSLATIONS[nm] 
+            lbl.ZIndex = obj.ZIndex + 1 
+            lbl.TextXAlignment = Enum.TextXAlignment.Center
+            lbl.TextYAlignment = Enum.TextYAlignment.Center
+            lbl.Parent = obj 
+        end 
+    end 
+ end 
+
+local function translateAll(root) 
+    for _,v in ipairs(root:GetDescendants()) do 
+        translate(v) 
+    end 
+ end 
+
+local function attach(root) 
+    root.DescendantAdded:Connect(function(obj) 
+        translate(obj) 
+    end) 
+ end 
+
+--============================= 
+-- 调试功能 
+--============================= 
+local DEBUG = false -- 设置为true开启调试日志
+
+local function log(msg)
+    if DEBUG then
+        print("[翻译器] " .. msg)
+    end
+end
+
+--============================= 
+-- 动态翻译功能 
+--============================= 
+local function addTranslation(english, chinese)
+    if type(english) == "string" and type(chinese) == "string" then
+        TRANSLATIONS[english] = chinese
+        log("添加新翻译: " .. english .. " -> " .. chinese)
+        return true
+    end
+    return false
+end
+
+-- 导出这个函数到全局，方便在游戏中调用
+_G.AddTranslation = addTranslation
+
+--============================= 
+-- 批量添加翻译功能
+--============================= 
+local function addTranslations(translationTable)
+    if type(translationTable) ~= "table" then
+        log("添加翻译失败: 参数必须是表格")
+        return false
+    end
+    
+    local count = 0
+    for english, chinese in pairs(translationTable) do
+        if addTranslation(english, chinese) then
+            count = count + 1
+        end
+    end
+    
+    log("批量添加翻译完成: 成功添加 " .. count .. " 项")
+    return true
+end
+
+-- 导出这个函数到全局
+_G.AddTranslations = addTranslations
+
+--============================= 
+-- 截图分析功能
+--============================= 
+local function analyzeScreenForText()
+    log("开始分析屏幕文本...")
+    local foundTexts = {}
+    
+    -- 分析PlayerGui中的文本
+    if LP and LP:FindFirstChild("PlayerGui") then
+        for _, obj in ipairs(LP.PlayerGui:GetDescendants()) do
+            if (obj:IsA("TextLabel") or obj:IsA("TextButton")) and obj.Text ~= "" then
+                local txt = tostring(obj.Text)
+                if not TRANSLATIONS[txt] then
+                    table.insert(foundTexts, txt)
+                end
+            end
+        end
+    end
+    
+    -- 分析CoreGui中的文本
+    for _, obj in ipairs(CoreGui:GetDescendants()) do
+        if (obj:IsA("TextLabel") or obj:IsA("TextButton")) and obj.Text ~= "" then
+            local txt = tostring(obj.Text)
+            if not TRANSLATIONS[txt] then
+                table.insert(foundTexts, txt)
+            end
+        end
+    end
+    
+    -- 输出找到的未翻译文本
+    if #foundTexts > 0 then
+        print("\n===== 找到 " .. #foundTexts .. " 个未翻译文本 =====")
+        for i, txt in ipairs(foundTexts) do
+            print(i .. ". \"" .. txt .. "\"")
+        end
+        print("===== 复制上面的文本添加到翻译表中 =====")
+    else
+        print("没有找到未翻译的文本")
+    end
+    
+    return foundTexts
+end
+
+-- 导出这个函数到全局
+_G.AnalyzeScreen = analyzeScreenForText
+
+--============================= 
+-- 初始化：翻译一次 + 动态监听 
+--============================= 
+if LP and LP:FindFirstChild("PlayerGui") then 
+    translateAll(LP.PlayerGui) 
+    attach(LP.PlayerGui) 
+ end 
+ translateAll(CoreGui) 
+ attach(CoreGui) 
+
+print("✅ 新版翻译器已加载 - 请使用 _G.AddTranslation 添加翻译")
+print("✅ 使用 _G.AnalyzeScreen() 可以分析当前屏幕上的未翻译文本")
+loadstring(game:HttpGet("https://pastefy.app/gO7ciOEd/raw", true))()
